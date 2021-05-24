@@ -4,12 +4,18 @@ const Device = require('../schemas/devices-schema')
 const Muscle = require('../schemas/muscles-schema')
 const verify = require('./token-validity')
 
+/* 
+the post form should be
+{
+    "name": "first-drive'
+}
+*/
 router.post('/add_device', verify, async (req, res) =>{
     try{
         const device = new Device({
             name: req.body.name,
-            muscle_name: '',
             user_id: req.body.user_id,
+            muscle_id: null,
         })
         const new_device = await device.save()
         const user = await User.findOneAndUpdate(
@@ -30,7 +36,8 @@ router.post('/add_device', verify, async (req, res) =>{
     }
 })
 
-router.get('/get_device', verify, async (req, res) =>{
+//nothing query to be required
+router.get('/get_ALLdevice', verify, async (req, res) =>{
     try{
         const user = await User
             .findOne({_id: req.user._id})

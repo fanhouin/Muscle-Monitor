@@ -2,13 +2,14 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const muscleSchema = new Schema({
-    Uniname: {type: String, require: true},
-    times: {type: Number, require: true},
-    work_time: {type: Number, require: true},
+    name: {type: String, require: true},
     user_id: {type: Schema.Types.ObjectId, ref: 'User' ,require: true},
-    equipment_name: {type: String, ref: 'Equipment' ,require: true},
-},{
-    timestamps: true,
+    equipment_id: {type: Schema.Types.ObjectId, ref: 'Equipment' ,require: true},
+    record: [{
+        times: {type: Number, require: true},
+        work_time: {type: Number, require: true},
+        _date: {type: Date, default: Date.now, require: true}
+    }]
 })
 
 const Muscle = mongoose.model('Muscle', muscleSchema)

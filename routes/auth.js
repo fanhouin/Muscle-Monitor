@@ -4,6 +4,15 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const {registerValidation, loginValidation} = require('./auth-validation')
 
+
+/* 
+the post form should be
+{
+     "email: "fan@gmail.com",
+     "password: "123456",
+     "name": "fanfan'
+}
+*/
 router.post('/register', async(req, res) => {
     //validation
     const validation = registerValidation(req.body)
@@ -41,8 +50,8 @@ router.post('/register', async(req, res) => {
         password: hashPassword,
         name: req.body.name,
         device_id: [],
-        muscle_name: [],
-        equipment_name: [],
+        muscle_id: [],
+        equipment_id: [],
     })
 
     try{
@@ -59,6 +68,13 @@ router.post('/register', async(req, res) => {
     }
 })
 
+/* 
+the post form should be
+{
+     "email: "fan@gmail.com",
+     "password: "123456",
+}
+*/
 router.post('/login', async(req, res) => {
     const validation = loginValidation(req.body)
     if (validation.error){
@@ -85,6 +101,7 @@ router.post('/login', async(req, res) => {
         }
     }
 
+    //check the password
     const validPass = await bcrypt.compare(req.body.password, user.password)
     if(!validPass){
         const errMsg = {

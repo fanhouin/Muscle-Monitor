@@ -4,10 +4,14 @@ const Muscle = require('../schemas/muscles-schema')
 const User = require('../schemas/users-schema')
 const verify = require('./token-validity')
 
-//TODO: get muscle data 
-//add muscle data
-//check device uni id(arduino)? 
 
+/* 
+the post form should be
+{
+     "_id": "xxxxxxxxxxxxxxxxxxxx",
+     "name": "biceps'
+}
+*/
 router.post('/change_muscle', verify, async (req, res) => {
     try {
         const user = await User
@@ -20,16 +24,22 @@ router.post('/change_muscle', verify, async (req, res) => {
             const device = await Device.findOneAndUpdate( //update device's muscle that it changed the muscle
                 {_id: req.body._id},
                 {'muscle_id': exist_muscle._id})
-            return
+            const successMsg = {
+                "message": 'ok',
+                "detials": 'changed success',
+            }
+            return res.json(successMsg)
         }
         
         //if the muscle isn't exist, create new one
         const muscle = new Muscle({
             name: req.body.name,
-            times: 0,
-            work_time: 0,
             user_id: req.user._id,
-            equipment: '',
+            equipment_id: null,
+            record: [{
+                times: 0,
+                work_time: 0,
+            }]
         })
         const new_muscle = await muscle.save() //create a muscle
         const device = await Device.findOneAndUpdate( //update device's muscle that it added the muscle
@@ -38,8 +48,14 @@ router.post('/change_muscle', verify, async (req, res) => {
         const addUserMuscle = await User
             .findOneAndUpdate({_id: req.user._id},
             {'$push':{
-                'muscle_id': muscle_id._id
+                'muscle_id': new_muscle._id
             }})
+
+        const successMsg = {
+            "message": 'ok',
+            "detials": 'create success',
+        }
+        res.json(successMsg)
     }
     catch (err) {
         console.log(err)
@@ -47,28 +63,24 @@ router.post('/change_muscle', verify, async (req, res) => {
     }
 })
 
+//nothing query to be required
+router.get('/get_ALLmuscle', verify, async (req, res) => {
+    try{
+        const user = await User
+            .findOne({_id: req.user._id})
+            .populate('muscle_id')
+            .exec()
 
-router.get('/test_muscle', verify, async (req, res) => {
-    // const muscle = new Muscle({
-    //     name: req.body.name,
-    //     times: 0,
-    //     work_time: 0,
-    //     user_id: req.user._id,
-    //     equipment: '',
-    // })
-    // const new_muscle = await muscle.save()
-    // const addUserMuscle = await User
-    // .findOneAndUpdate({_id: req.user._id},
-    // {'$push':{
-    //     'muscle_id': new_muscle._id
-    // }})
-
-    // res.send(muscle)
-    const user = await User
-        .findOne({_id: req.user._id})
-        .populate('muscle_id')
-    const exist_muscle = user.muscle_id.find(item => item.name === req.body.name) 
-    res.send(exist_muscle)
+        if(!user) return res.status(400).send('Bad require')
+        res.send(user.muscle_id)
+    }
+    catch(err){
+        console.log(err)
+        return res.status(500).json(err)
+    }
 })
 
+
+// const exist_muscle = user.muscle_id.find(item => item.name === req.body.name) 
+// res.send(exist_muscle)
 module.exports = router
