@@ -1,0 +1,23 @@
+{
+  "name": "iot_final_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gym-app.js",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^10.0.0",
+    "expree": "^0.0.7",
+    "joi": "^17.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.10",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "nodemon gym-app.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
