@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const User = require('../schemas/users-schmea')
+const User = require('../schemas/users-schema')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const {registerValidation, loginValidation} = require('./auth-validation')
@@ -41,13 +41,17 @@ router.post('/register', async(req, res) => {
         password: hashPassword,
         name: req.body.name,
         device_id: [],
-        muscle_id: [],
-        equipment_id: [],
+        muscle_name: [],
+        equipment_name: [],
     })
 
     try{
         const saveUser = await user.save()
-        res.send({user_id: user._id})
+        const successMsg = {
+            message: 'ok',
+            detials: 'Successfully registered'
+        }
+        res.json(successMsg)
     }
     catch(err){
         console.log(err)

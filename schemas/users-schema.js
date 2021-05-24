@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 //This is user schamea which is use to login and register
-const userSchmea = new Schema({
+const userSchema = new Schema({
     email : {type: String, require:true, min:6, max:255},
     password: {type: String, require:true, min:6, max:1024},
     name : {type: String, require:true, max:20},
@@ -11,5 +11,5 @@ const userSchmea = new Schema({
     equipment_name : [{type: String, ref: 'Equipment', require: true}],
 })
 
-const User = mongoose.model('User', userSchmea)
+const User = mongoose.model('User', userSchema)
 module.exports = User

@@ -1,16 +1,15 @@
 const router = require('express').Router()
-const User = require('../schemas/users-schmea')
-const Device = require('../schemas/devices-schmea')
-const Muscle = require('../schemas/muscles-schmea')
+const User = require('../schemas/users-schema')
+const Device = require('../schemas/devices-schema')
+const Muscle = require('../schemas/muscles-schema')
 const verify = require('./token-validity')
 
 router.post('/add_device', verify, async (req, res) =>{
     try{
         const device = new Device({
             name: req.body.name,
-            position: req.body.position,
+            muscle_name: '',
             user_id: req.body.user_id,
-            muscle_id: ''
         })
         const new_device = await device.save()
         const user = await User.findOneAndUpdate(

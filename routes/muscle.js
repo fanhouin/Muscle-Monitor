@@ -1,7 +1,7 @@
 const router = require('express').Router()
-const Device = require('../schemas/devices-schmea')
-const Muscle = require('../schemas/muscles-schmea')
-const User = require('../schemas/users-schmea')
+const Device = require('../schemas/devices-schema')
+const Muscle = require('../schemas/muscles-schema')
+const User = require('../schemas/users-schema')
 const verify = require('./token-validity')
 
 //TODO: get muscle data 
