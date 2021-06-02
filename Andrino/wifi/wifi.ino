@@ -2,12 +2,13 @@
 #include <SoftwareSerial.h>
 #include <stdio.h>
 #include "ESP8266.h"
+#include "env.h"
 
 //wifi
-#define SSID        "on9wifi"
-#define PASSWORD    "P@ssw0rd2020"
-#define HOST_NAME   "3.142.81.36"
-#define HOST_PORT   (16169)
+#define SSID        ssid
+#define PASSWORD    ssid_pwd
+#define HOST_NAME   host_name
+#define HOST_PORT   (host_port)
 SoftwareSerial mySerial(8,9);
 ESP8266 wifi(mySerial);
 
@@ -24,7 +25,6 @@ static TaskHandle_t wifi_task_handle = NULL;
 
 void wifi_init(){
   Serial.print("setup begin\r\n");
-  
   Serial.print("FW Version:");
   Serial.println(wifi.getVersion().c_str());
     
