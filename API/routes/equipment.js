@@ -45,7 +45,7 @@ router.get('/get_ALLequipment', verify, async (req, res) =>{
             .find({user_id: req.user._id})
             .exec()
 
-        if(!equipment) return res.status(400).send('Bad require')
+        if(!equipment) return res.status(400).send('Bad request')
         res.send(equipment)
     }
     catch(err){

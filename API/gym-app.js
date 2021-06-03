@@ -5,6 +5,9 @@ const dotenv = require('dotenv')
 const app = express()
 dotenv.config()
 
+//connect to mqtt_client
+const mqtt_clinet = require('./routes/mqtt_client')
+
 //import routes
 const authRoute = require('./routes/auth')
 const deviceRoute = require('./routes/device')

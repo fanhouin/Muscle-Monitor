@@ -96,8 +96,8 @@ router.post('/change_equipment_muscle', verify, async (req, res) => {
             user_id: req.user._id,
             equipment_id: req.body.equipment_id,
             record: [{
-                times: 0,
-                work_time: 0,
+                set: 0,
+                weight: 0,
             }]
         })
         const new_muscle = await muscle.save() //create a muscle
@@ -129,7 +129,7 @@ router.get('/get_ALLmuscle', verify, async (req, res) => {
             .find({user_id: req.user._id})
             .exec()
 
-        if(!muscles) return res.status(400).send('Bad require')
+        if(!muscles) return res.status(400).send('Bad request')
         res.send(muscles)
     }
     catch(err){
@@ -150,7 +150,7 @@ router.get('/get_muscle', verify, async (req, res) => {
             .findOne({user_id: req.user._id, name:req.body.name})
             .exec()
 
-        if(!muscle) return res.status(400).send('Bad require')
+        if(!muscle) return res.status(400).send('Bad request')
         res.send(muscle)
     }
     catch(err){

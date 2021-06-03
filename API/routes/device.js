@@ -3,6 +3,8 @@ const User = require('../schemas/users-schema')
 const Device = require('../schemas/devices-schema')
 const Muscle = require('../schemas/muscles-schema')
 const verify = require('./token-validity')
+const mqtt_clinet = require('./mqtt_client')
+const utf8 = require('utf8');
 
 /* 
 the post form should be
@@ -43,8 +45,12 @@ router.get('/get_ALLdevice', verify, async (req, res) =>{
             .find({user_id: req.user._id})
             .exec()
 
-        if(!device) return res.status(400).send('Bad require')
-        res.send(device)
+        if(!device) return res.status(400).send('Bad request')
+        
+        let en = JSON.stringify(device[0])
+        console.log(en)
+        mqtt_clinet.write('app@@@@' + en)
+        res.send(device[0])
     }
     catch(err){
         console.log(err)

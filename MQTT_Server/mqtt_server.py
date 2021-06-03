@@ -20,6 +20,7 @@ currentRing = None
 Lock = threading.Lock()
 # [HINT] variable for socket
 conn, addr = None,None
+connPool = {}
 
 
 def mqttcallback(client, userdata, message):
@@ -33,19 +34,18 @@ def mqttcallback(client, userdata, message):
             send_string = "ring: " +  str(msg["state"]["desired"]["ring"])
             print("send: " + send_string)
             send_string = send_string.encode('utf-8')
-            print("send_hex: " + str(send_string))
             conn.send(send_string)
     except Exception as e:
         print(e)
 
 
 
-# # [TODO] Define ENDPOINT, CLIENT_ID, PATH_TO_CERT, PATH_TO_KEY, PATH_TO_ROOT
+# [TODO] Define ENDPOINT, CLIENT_ID, PATH_TO_CERT, PATH_TO_KEY, PATH_TO_ROOT
 # ENDPOINT = "a3vxe6kv2l8z0g-ats.iot.us-east-2.amazonaws.com"
-# CLIENT_ID = "Lab3"
+# CLIENT_ID = "muscle_1"
 # PATH_TO_ROOT = "./CA.txt"
-# PATH_TO_KEY = "./e44e56a37e-private.pem.key"
-# PATH_TO_CERT = "./e44e56a37e-certificate.pem.crt"
+# PATH_TO_KEY = "./b9b91a2ed9-private.pem.key"
+# PATH_TO_CERT = "./b9b91a2ed9-certificate.pem.crt"
 
 
 # myAWSIoTMQTTClient = AWSIoTPyMQTT.AWSIoTMQTTClient(CLIENT_ID)
@@ -59,18 +59,34 @@ def mqttcallback(client, userdata, message):
 
 
 def on_new_client(clientsocket,addr):
-    global currentRing
+    global currentRing, connPool
     while True:
         # [TODO] decode message from Arduino and send to AWS
-        receive = clientsocket.recv(20).decode('utf-8')
-        print("recv: " + receive)
-        conn.send("0".encode('utf-8'))
-        # receive = receive.split(',')
+        receive = clientsocket.recv(1024).decode('utf-8')
+        datas = receive.split('@@@@')
+        if datas[0] == 'app':
+            data = json.loads(datas[1])
+            sendclient = connPool['1']
+            sendclient.send('send'.encode('utf8'))
+            print(data['name'])
+
+        elif datas[0] == 'device':
+            print(datas[1])
+            conn.send('device'.encode('utf8'))
+            
+        elif datas[0] == 'mac_id':
+            print(datas[1])
+            connPool[datas[1]] = conn
+            print(connPool[datas[1]])
+            conn.send('get_mac'.encode('utf8'))
+            
+        
         # payload = {
         #     "state":{
         #         "reported":{
-        #             "humidity":float(receive[0]),
-        #             "ring":float(receive[1])
+        #             "temperature":float(receive[0]),
+        #             "humidity":float(receive[1]),
+        #             "ring":0,
         #         }
         #     }  
 	    # }
@@ -84,11 +100,12 @@ print('wait for connection...')
 def main():
     global conn, addr
     try:
-        conn, addr = s.accept()
-        print('connected by ' + str(addr))
-        t = threading.Thread(target=on_new_client,args=(conn,addr))
-        tSocket.append(t)
-        tSocket[-1].start()
+        while True:
+            conn, addr = s.accept()
+            print('connected by ' + str(addr))
+            t = threading.Thread(target=on_new_client,args=(conn,addr))
+            tSocket.append(t)
+            tSocket[-1].start()
     except Exception as e:
         print(e)
         s.close()

@@ -91,7 +91,7 @@ void muscle_sensor(void *pvParameters){
 //      Serial.print(count);
 //      Serial.print("| work_time: ");
 //      Serial.println(work_time);
-      String send_string = String(count) + "," + String(work_time);
+      String send_string = "device@@" + String(count) + "," + String(work_time);
       const char *send_char = send_string.c_str();
       wifi.send(send_char, strlen(send_char));
 //      Serial.println("send");
