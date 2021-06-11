@@ -8,6 +8,7 @@ const muscleSchema = new Schema({
     record: [{
         times: {type: Number, require: true},
         work_time: {type: Number, require: true},
+        weight: {type: Number, require: true},
         _date: {type: Date, default: Date.now, require: true}
     }]
 })

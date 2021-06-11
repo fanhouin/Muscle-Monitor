@@ -9,13 +9,13 @@ const utf8 = require('utf8');
 /* 
 the post form should be
 {
-    "name": "first-drive'
+    "mac": '1'
 }
 */
 router.post('/add_device', verify, async (req, res) =>{
     try{
         const device = new Device({
-            name: req.body.name,
+            mac: req.body.mac,
             user_id: req.user._id,
             muscle_id: null,
         })
@@ -47,12 +47,76 @@ router.get('/get_ALLdevice', verify, async (req, res) =>{
 
         if(!device) return res.status(400).send('Bad request')
         
-        let en = JSON.stringify(device[0])
-        console.log(en)
-        mqtt_clinet.write('app@@@@' + en)
         res.send(device[0])
     }
     catch(err){
+        console.log(err)
+        return res.status(500).json(err)
+    }
+})
+
+
+/* 
+the post form should be
+{
+    "mac":"xxx"
+    "name": "biceps'
+}
+*/
+router.post('/change_device_muscle', verify, async (req, res) => {
+    try {
+        //check the muscle's name if it is exist
+        const exist_muscle = await Muscle
+            .findOne({user_id: req.user._id, name:req.body.name})
+            .exec()
+        
+        if(exist_muscle){
+            const device = await Device.findOneAndUpdate( //update device's muscle that it changed the muscle
+                {mac: req.body.mac}, //device's id
+                {'muscle_id': exist_muscle._id})
+            const successMsg = {
+                "message": 'ok',
+                "detials": 'changed success',
+            }
+            return res.json(successMsg)
+        }
+        
+        //if the muscle isn't exist, create new one
+        const muscle = new Muscle({
+            name: req.body.name,
+            user_id: req.user._id,
+            equipment_id: null,
+            record: []
+            // {
+            //     times: 0,
+            //     work_time: 0,
+            //     weight: 0
+            // }
+        })
+        const new_muscle = await muscle.save() //create a muscle
+        const device = await Device.findOneAndUpdate( //update device's muscle that it added the muscle
+            {mac: req.body.mac},
+            {'muscle_id': new_muscle._id})
+        const addUserMuscle = await User
+            .findOneAndUpdate({_id: req.user._id},
+            {'$push':{
+                'muscle_id': new_muscle._id
+            }})
+
+        //send the message to the real device, let it know which muscle
+        const msg = {
+            mac: mac,
+            info: 'muscle_name,' + req.body.name
+        }
+        mqtt_clinet.write('app@@@@' + JSON.stringify(msg))
+
+        const successMsg = {
+            "message": 'ok',
+            "detials": 'create success',
+        }
+        res.json(successMsg)
+    }
+    catch (err) {
         console.log(err)
         return res.status(500).json(err)
     }

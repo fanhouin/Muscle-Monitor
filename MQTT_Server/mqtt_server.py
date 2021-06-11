@@ -61,24 +61,25 @@ def mqttcallback(client, userdata, message):
 def on_new_client(clientsocket,addr):
     global currentRing, connPool
     while True:
-        # [TODO] decode message from Arduino and send to AWS
         receive = clientsocket.recv(1024).decode('utf-8')
         datas = receive.split('@@@@')
+        #send the message to the real device
+        # (this situation is for api server)
         if datas[0] == 'app':
             data = json.loads(datas[1])
-            sendclient = connPool['1']
-            sendclient.send('send'.encode('utf8'))
-            print(data['name'])
-
+            sendclient = connPool[data['mac']]
+            sendclient.send(str([data['info']] + '\n').encode('utf8'))
+        #when the device connect, 
+        #need to know the mac and push it's conn to connpool
+        elif datas[0] == 'mac_address':
+            connPool[datas[1]] = conn
+            print('new conn:')
+            print(connPool[datas[1]])
+            conn.send('mqtt_server: get mac address'.encode('utf8'))
+        #receive the device data
         elif datas[0] == 'device':
             print(datas[1])
             conn.send('device'.encode('utf8'))
-            
-        elif datas[0] == 'mac_id':
-            print(datas[1])
-            connPool[datas[1]] = conn
-            print(connPool[datas[1]])
-            conn.send('get_mac'.encode('utf8'))
             
         
         # payload = {

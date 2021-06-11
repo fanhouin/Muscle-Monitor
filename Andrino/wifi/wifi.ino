@@ -20,6 +20,13 @@ unsigned long btn_last_time = 0;//debounce
 int count = 0;
 int work_time = 0;
 
+//state
+enum State {
+    INIT,
+    SEND
+};
+enum State state = INIT;
+
 static TaskHandle_t muscle_task_handle = NULL;
 static TaskHandle_t wifi_task_handle = NULL;
 
@@ -69,6 +76,8 @@ void setup() {
 
 void muscle_sensor(void *pvParameters){
   for(;;){
+    if(state == INIT) return;
+    
     int btn_val = digitalRead(btnpin);
     unsigned long now_time = millis();
     if(btn_val && btn_up){
@@ -91,7 +100,7 @@ void muscle_sensor(void *pvParameters){
 //      Serial.print(count);
 //      Serial.print("| work_time: ");
 //      Serial.println(work_time);
-      String send_string = "device@@" + String(count) + "," + String(work_time);
+      String send_string = "device@@@@" + String(count) + "," + String(work_time);
       const char *send_char = send_string.c_str();
       wifi.send(send_char, strlen(send_char));
 //      Serial.println("send");
@@ -105,9 +114,12 @@ void muscle_sensor(void *pvParameters){
 }
 
 void wifi_send_recv(void *pvParameters){
-  bool create_led_task = false;
+  bool create_muscle_task = false;
   for(;;){
-
+    if(!create_muscle_task){
+      const char* send_char = "mac_id@@@@1";
+      wifi.send(send_char, strlen(send_char));
+    }
     uint8_t buffer[128] = {0};
     uint32_t len = wifi.recv(buffer, sizeof(buffer), 10000);
     if (len > 0) {
@@ -115,6 +127,11 @@ void wifi_send_recv(void *pvParameters){
             Serial.print((char)buffer[i]);
         }
         Serial.print("\r\n");
+        if(String((char)buffer) == "get_mac"){ //maybe overflow????
+          create_muscle_task = true;
+          state = SEND;
+          xTaskCreate(muscle_sensor, "muscle_sensor", 128, NULL, 1, &muscle_task_handle);
+        }
     }
     vTaskDelay(1000/portTICK_PERIOD_MS);
   }
