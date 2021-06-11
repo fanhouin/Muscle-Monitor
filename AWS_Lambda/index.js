@@ -15,7 +15,7 @@ const User = mongoose.model('User', userSchema)
 
         
 exports.handler = async (event, context, callback) => {
-    // TODO implement
+    // TODO: upload the muscle data
     //context.callbackWaitsForEmptyEventLoop = false;
     mongoose.connect(DB_URL, {useNewUrlParser: true, useUnifiedTopology: true})
         .then(() => console.log('connected to db'))

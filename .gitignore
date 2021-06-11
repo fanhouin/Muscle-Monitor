@@ -2,3 +2,4 @@ API/node_modules/
 API/.env
 API/app.js
 Andrino/wifi/env.h
+Andrino/wifi_8266/env.h

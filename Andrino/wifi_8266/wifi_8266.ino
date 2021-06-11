@@ -175,6 +175,8 @@ void device_send(){
     work_time = 0;
     count = 0;
   }
+
+  //TODO: sum the count to update equipment's set
 }
 
 void loop() {

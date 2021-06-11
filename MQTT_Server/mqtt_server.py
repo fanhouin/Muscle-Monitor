@@ -22,7 +22,7 @@ Lock = threading.Lock()
 conn, addr = None,None
 connPool = {}
 
-
+# TODO: mqtt send the device message
 def mqttcallback(client, userdata, message):
     global currentRing,conn,addr,Lock
     try:
@@ -37,7 +37,6 @@ def mqttcallback(client, userdata, message):
             conn.send(send_string)
     except Exception as e:
         print(e)
-
 
 
 # [TODO] Define ENDPOINT, CLIENT_ID, PATH_TO_CERT, PATH_TO_KEY, PATH_TO_ROOT
