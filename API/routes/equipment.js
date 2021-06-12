@@ -61,8 +61,8 @@ router.get('/get_ALLequipment', verify, async (req, res) =>{
 /* 
 the post form should be
 {
-    "equipment_id": "xxxxxxxxxxxxxxxxxxxx",
-    "mac": "xxx"
+    "name": "first-name",
+    "mac": "CC:50:E3:4A:56:E4"
 }
 */
 router.post('/change_equipment_device', verify, async (req, res) => {
@@ -75,8 +75,16 @@ router.post('/change_equipment_device', verify, async (req, res) => {
         if(!exist_device) return res.status(400).send('Bad request')
 
         const equipment = await Equipment.findOneAndUpdate( //update device's muscle that it changed the muscle
-            {_id: req.body.equipment_id}, //equipment's id
+            {user_id: req.user._id, name: req.body.name}, 
             {'device_id': exist_device._id})
+
+        const msg = {
+            mac: req.body.mac,
+            user_id: req.user._id,
+            info: 'equipment_name,' + req.body.name
+        }
+        mqtt_clinet.write('app@@@@' + JSON.stringify(msg))
+
         const successMsg = {
             "message": 'ok',
             "detials": 'changed success',
@@ -92,29 +100,34 @@ router.post('/change_equipment_device', verify, async (req, res) => {
 /* 
 the post form should be
 {
-    "equipment_id": "xxxxxxxxxxxxxxxxxxxx",
-    "weight": "5"    it means 5kg
+    "name": "first-name",
+    "weight": "5" --> it means 5kg
 }
 */
 router.post('/change_equipment_weight', verify, async (req, res) => {
     try {
         const equipment = await Equipment
-            .findOne({user_id: req.user._id, _id: req.body.equipment_id})
+            .findOne({user_id: req.user._id, name: req.body.name})
             .populate('device_id','mac')
             .exec()
         if(!equipment) return res.status(400).send('Bad request')
-    
         const msg = {
             mac: equipment.device_id.mac,
-            info: 'equipment_weight,' + req.body.name
+            user_id: req.user._id,
+            info: 'equipment_weight,' + req.body.weight
         }
         mqtt_clinet.write('app@@@@' + JSON.stringify(msg))
+
+        const successMsg = {
+            "message": 'ok',
+            "detials": 'changed success',
+        }
+        return res.json(successMsg)
     }
     catch(err){
         console.log(err)
         return res.status(500).json(err)
     }
 })
-
 
 module.exports = router

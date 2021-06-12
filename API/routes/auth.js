@@ -10,7 +10,7 @@ the post form should be
 {
      "email: "fan@gmail.com",
      "password: "123456",
-     "name": "fanfan'
+     "name": "fanfan"
 }
 */
 router.post('/register', async(req, res) => {

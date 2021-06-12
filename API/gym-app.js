@@ -24,7 +24,7 @@ app.use(express.json())
 
 //route middlewares
 app.use(morgan('dev'))
-app.use('/api/user', authRoute)
+app.use('/api/auth', authRoute)
 app.use('/api/device', deviceRoute)
 app.use('/api/muscle', muscleRoute)
 app.use('/api/equipment', equipmentRoute)

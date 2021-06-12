@@ -4,7 +4,6 @@ const Schema = mongoose.Schema
 const muscleSchema = new Schema({
     name: {type: String, require: true},
     user_id: {type: Schema.Types.ObjectId, ref: 'User' ,require: true},
-    equipment_id: {type: Schema.Types.ObjectId, ref: 'Equipment' ,require: true},
     record: [{
         times: {type: Number, require: true},
         work_time: {type: Number, require: true},

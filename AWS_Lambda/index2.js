@@ -1,1 +1,0 @@
-//TODO: upload the equipment data

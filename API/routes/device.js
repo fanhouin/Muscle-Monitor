@@ -9,7 +9,7 @@ const utf8 = require('utf8');
 /* 
 the post form should be
 {
-    "mac": '1'
+    "mac": "CC:50:E3:4A:56:E4"
 }
 */
 router.post('/add_device', verify, async (req, res) =>{
@@ -59,8 +59,8 @@ router.get('/get_ALLdevice', verify, async (req, res) =>{
 /* 
 the post form should be
 {
-    "mac":"xxx"
-    "name": "biceps'
+    "mac": "CC:50:E3:4A:56:E4",
+    "name": "biceps"
 }
 */
 router.post('/change_device_muscle', verify, async (req, res) => {
@@ -78,6 +78,14 @@ router.post('/change_device_muscle', verify, async (req, res) => {
                 "message": 'ok',
                 "detials": 'changed success',
             }
+            console.log(req.body.mac)
+            //send the message to the real device, let it know which muscle
+            const msg = {
+                mac: req.body.mac,
+                user_id: req.user._id,
+                info: 'muscle_name,' + req.body.name
+            }
+            mqtt_clinet.write('app@@@@' + JSON.stringify(msg))
             return res.json(successMsg)
         }
         
@@ -85,13 +93,7 @@ router.post('/change_device_muscle', verify, async (req, res) => {
         const muscle = new Muscle({
             name: req.body.name,
             user_id: req.user._id,
-            equipment_id: null,
             record: []
-            // {
-            //     times: 0,
-            //     work_time: 0,
-            //     weight: 0
-            // }
         })
         const new_muscle = await muscle.save() //create a muscle
         const device = await Device.findOneAndUpdate( //update device's muscle that it added the muscle
@@ -105,7 +107,8 @@ router.post('/change_device_muscle', verify, async (req, res) => {
 
         //send the message to the real device, let it know which muscle
         const msg = {
-            mac: mac,
+            mac: req.body.mac,
+            user_id: req.user._id,
             info: 'muscle_name,' + req.body.name
         }
         mqtt_clinet.write('app@@@@' + JSON.stringify(msg))

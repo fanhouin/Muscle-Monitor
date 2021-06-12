@@ -5,6 +5,7 @@
   "main": "gym-app.js",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
+    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "dotenv": "^10.0.0",
     "expree": "^0.0.7",
