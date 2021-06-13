@@ -9,7 +9,7 @@ const Muscle = require('../schemas/muscles-schema')
 /* 
 the post form should be
 {
-    "name": "first-equipment'
+    "name": "Left Dumbbell"
 }
 */
 router.post('/add_equipment', verify, async (req, res) => {
@@ -61,7 +61,7 @@ router.get('/get_ALLequipment', verify, async (req, res) =>{
 /* 
 the post form should be
 {
-    "name": "first-name",
+    "name": "Right Dumbbell",
     "mac": "CC:50:E3:4A:56:E4"
 }
 */
@@ -74,9 +74,11 @@ router.post('/change_equipment_device', verify, async (req, res) => {
 
         if(!exist_device) return res.status(400).send('Bad request')
 
-        const equipment = await Equipment.findOneAndUpdate( //update device's muscle that it changed the muscle
+        const exist_equipment = await Equipment.findOneAndUpdate( //update device's muscle that it changed the muscle
             {user_id: req.user._id, name: req.body.name}, 
             {'device_id': exist_device._id})
+
+        if(!exist_equipment) return res.status(400).send('Bad request')
 
         const msg = {
             mac: req.body.mac,
@@ -123,6 +125,38 @@ router.post('/change_equipment_weight', verify, async (req, res) => {
             "detials": 'changed success',
         }
         return res.json(successMsg)
+    }
+    catch(err){
+        console.log(err)
+        return res.status(500).json(err)
+    }
+})
+
+
+/* 
+the post form should be
+{
+     "name": "first-name"
+}
+*/
+router.get('/get_equipment_record_sum', verify, async (req, res) => {
+    try{
+        const equipment = await Equipment
+            .findOne({user_id: req.user._id, name:req.body.name})
+            .exec()
+
+        if(!equipment) return res.status(400).send('Bad request')
+        const record = equipment.record
+        let msg = {}
+        record.forEach((item, index) =>{
+            if (!msg[item.weight]) {
+                msg[item.weight] = {set: item.set}
+            }
+            else{
+                msg[item.weight].set += item.set
+            }
+        })
+        res.send(msg)
     }
     catch(err){
         console.log(err)

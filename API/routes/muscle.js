@@ -30,14 +30,25 @@ the post form should be
      "name": "biceps'
 }
 */
-router.get('/get_muscle', verify, async (req, res) => {
+router.get('/get_muscle_record_sum', verify, async (req, res) => {
     try{
         const muscle = await Muscle
             .findOne({user_id: req.user._id, name:req.body.name})
             .exec()
 
         if(!muscle) return res.status(400).send('Bad request')
-        res.send(muscle)
+        const record = muscle.record
+        let msg = {}
+        record.forEach((item, index) =>{
+            if (!msg[item.weight]) {
+                msg[item.weight] = {count: item.times, work_time: item.work_time/1000}
+            }
+            else{
+                msg[item.weight].count += item.times
+                msg[item.weight].work_time += item.work_time/1000
+            }
+        })
+        res.send(msg)
     }
     catch(err){
         console.log(err)

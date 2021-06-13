@@ -8,9 +8,9 @@ const {registerValidation, loginValidation} = require('./auth-validation')
 /* 
 the post form should be
 {
-     "email: "fan@gmail.com",
-     "password: "123456",
-     "name": "fanfan"
+    "email": "fan@gmail.com",
+    "password": "123456",
+    "name": "fanfan"
 }
 */
 router.post('/register', async(req, res) => {
@@ -71,8 +71,8 @@ router.post('/register', async(req, res) => {
 /* 
 the post form should be
 {
-     "email: "fan@gmail.com",
-     "password: "123456",
+    "email": "fan@gmail.com",
+    "password": "123456"
 }
 */
 router.post('/login', async(req, res) => {

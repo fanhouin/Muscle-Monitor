@@ -60,7 +60,7 @@ router.get('/get_ALLdevice', verify, async (req, res) =>{
 the post form should be
 {
     "mac": "CC:50:E3:4A:56:E4",
-    "name": "biceps"
+    "name": "Right Bicep"
 }
 */
 router.post('/change_device_muscle', verify, async (req, res) => {
@@ -72,7 +72,7 @@ router.post('/change_device_muscle', verify, async (req, res) => {
         
         if(exist_muscle){
             const device = await Device.findOneAndUpdate( //update device's muscle that it changed the muscle
-                {mac: req.body.mac}, //device's id
+                {user_id: req.user._id, mac: req.body.mac}, //device's id
                 {'muscle_id': exist_muscle._id})
             const successMsg = {
                 "message": 'ok',

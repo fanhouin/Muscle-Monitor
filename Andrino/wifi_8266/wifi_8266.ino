@@ -162,7 +162,7 @@ void device_send(){
   if(checkmsg) analysis_msg(buf);
 
   int N_val = analogRead(N_pin);
-  bool btn_val = N_val > 10;
+  bool btn_val = N_val > 800;
   delay(3);
 
   unsigned long now_time = millis();
