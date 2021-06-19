@@ -50,9 +50,13 @@ def on_new_client(clientsocket,addr):
         if datas[0] == 'app':
             data = json.loads(datas[1])
             print(data)
-            sendclient = connPool[data['mac']]
-            userPool[data['mac']] = data['user_id'] #save the mac-user_id in hashmap
-            sendclient.send((data['info'] + '\n').encode('utf8'))
+            try:
+                sendclient = connPool[data['mac']]
+                userPool[data['mac']] = data['user_id'] #save the mac-user_id in hashmap
+                sendclient.send((data['info'] + '\n').encode('utf8'))
+            except:
+                print("Not Find device")
+            
         #when the device connect, 
         #need to know the mac and push it's conn to connpool
         elif datas[0] == 'mac_address':

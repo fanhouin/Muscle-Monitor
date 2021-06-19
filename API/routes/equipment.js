@@ -46,6 +46,7 @@ router.get('/get_ALLequipment', verify, async (req, res) =>{
     try{
         const equipment = await Equipment
             .find({user_id: req.user._id})
+            .populate('device_id','mac')
             .exec()
 
         if(!equipment) return res.status(400).send('Bad request')
@@ -102,14 +103,14 @@ router.post('/change_equipment_device', verify, async (req, res) => {
 /* 
 the post form should be
 {
-    "name": "first-name",
+    "name": "Right Dumbbell",
     "weight": "5" --> it means 5kg
 }
 */
 router.post('/change_equipment_weight', verify, async (req, res) => {
     try {
         const equipment = await Equipment
-            .findOne({user_id: req.user._id, name: req.body.name})
+            .findOneAndUpdate({user_id: req.user._id, name: req.body.name}, {weight: req.body.weight})
             .populate('device_id','mac')
             .exec()
         if(!equipment) return res.status(400).send('Bad request')
@@ -141,6 +142,7 @@ the post form should be
 */
 router.get('/get_equipment_record_sum', verify, async (req, res) => {
     try{
+        console.log(req.body.name)
         const equipment = await Equipment
             .findOne({user_id: req.user._id, name:req.body.name})
             .exec()
@@ -148,14 +150,17 @@ router.get('/get_equipment_record_sum', verify, async (req, res) => {
         if(!equipment) return res.status(400).send('Bad request')
         const record = equipment.record
         let msg = {}
-        record.forEach((item, index) =>{
-            if (!msg[item.weight]) {
-                msg[item.weight] = {set: item.set}
-            }
-            else{
-                msg[item.weight].set += item.set
-            }
-        })
+        if(record){
+            record.forEach((item, index) =>{
+                if (!msg[item.weight]) {
+                    msg[item.weight] = {set: item.set}
+                }
+                else{
+                    msg[item.weight].set += item.set
+                }
+            })
+        }
+
         res.send(msg)
     }
     catch(err){

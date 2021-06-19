@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const morgan = require('morgan')
 const dotenv = require('dotenv')
 const app = express()
+const cors = require('cors');
 dotenv.config()
 
 //connect to mqtt_client
@@ -21,7 +22,9 @@ mongoose.connect(process.env.DB_URL, {useNewUrlParser: true, useUnifiedTopology:
 
 //middleware
 app.use(express.json())
-
+app.use(cors({
+    origin: ['http://localhost:8080'],
+}))
 //route middlewares
 app.use(morgan('dev'))
 app.use('/api/auth', authRoute)

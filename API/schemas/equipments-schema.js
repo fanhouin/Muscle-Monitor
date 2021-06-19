@@ -5,6 +5,7 @@ const equipmentSchema = new Schema({
     name: {type: String, require: true},
     user_id: {type: Schema.Types.ObjectId, ref: 'User', require: true},
     device_id: {type: Schema.Types.ObjectId, ref: 'Device', require: true},
+    weight: {type: Number, require: true},
     record: [{
         weight: {type: Number, require: true},
         set: {type: Number, require: true},

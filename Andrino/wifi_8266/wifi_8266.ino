@@ -41,6 +41,7 @@ enum State {
 };
 enum State state = CONNECT;
 bool create_muscle_task = false;
+int muscle_state = 0;
 
 void wifi_init(){
   Serial.println();
@@ -162,7 +163,10 @@ void device_send(){
   if(checkmsg) analysis_msg(buf);
 
   int N_val = analogRead(N_pin);
-  bool btn_val = N_val > 800;
+  if(N_val > 750 && muscle_state == 0) muscle_state = 1;
+  if(N_val < 600 && muscle_state == 1) muscle_state = 0;
+  Serial.println(muscle_state);
+  bool btn_val = muscle_state;
   delay(3);
 
   unsigned long now_time = millis();
@@ -190,7 +194,10 @@ void device_send(){
       total_count -= set * 10;
       CanSend_e = true;
     }
-    Serial.println(total_count);
+    Serial.print("count: "); 
+    Serial.println(count);
+    Serial.print("work_time: ");
+    Serial.println(work_time);
     send_time_m = now_time;
     work_time = 0;
     count = 0;

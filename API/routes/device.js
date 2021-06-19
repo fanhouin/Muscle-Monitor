@@ -43,11 +43,12 @@ router.get('/get_ALLdevice', verify, async (req, res) =>{
     try{
         const device = await Device
             .find({user_id: req.user._id})
+            .populate('muscle_id','name')
             .exec()
 
         if(!device) return res.status(400).send('Bad request')
         
-        res.send(device[0])
+        res.send(device)
     }
     catch(err){
         console.log(err)
