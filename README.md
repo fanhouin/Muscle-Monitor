@@ -1,4 +1,4 @@
-# Muscle-monitor
+# Muscle-Monitor
 ## What is this?
 1. This is an amazing iot device
 2. It can quantify the state of your muscles
